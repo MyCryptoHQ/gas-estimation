@@ -30,14 +30,11 @@ describe('estimateFees', () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
-  const mockProvider = ({
-    getLatestBlock: jest.fn(),
-    getFeeHistory: jest.fn()
-  } as unknown) as ProviderHandler;
+  const mockProvider = {
+    send: jest.fn()
+  };
   it('estimates without using priority fees', () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce(block);
+    mockProvider.send.mockResolvedValueOnce(block);
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
       baseFee: bigify('10000000000'),
       maxFeePerGas: bigify('20000000000'),
@@ -46,12 +43,12 @@ describe('estimateFees', () => {
   });
 
   it('estimates priority fees', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('100000000000') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce(feeHistory);
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return feeHistory;
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('100000000000') };
+    });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
       baseFee: bigify('100000000000'),
       maxFeePerGas: bigify('160000000000'),
@@ -60,24 +57,24 @@ describe('estimateFees', () => {
   });
 
   it('estimates priority fees removing low outliers', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('100000000000') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce({
-      ...feeHistory,
-      reward: [
-        ['0x1'],
-        ['0x1'],
-        ['0x1'],
-        ['0x1'],
-        ['0x1'],
-        ['0x1a13b8600'],
-        ['0x12a05f1f9'],
-        ['0x3b9aca00'],
-        ['0x1a13b8600']
-      ]
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return {
+          ...feeHistory,
+          reward: [
+            ['0x1'],
+            ['0x1'],
+            ['0x1'],
+            ['0x1'],
+            ['0x1'],
+            ['0x1a13b8600'],
+            ['0x12a05f1f9'],
+            ['0x3b9aca00'],
+            ['0x1a13b8600']
+          ]
+        };
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('100000000000') };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
       baseFee: bigify('100000000000'),
@@ -87,12 +84,12 @@ describe('estimateFees', () => {
   });
 
   it('uses 1.6 multiplier for base if above 40 gwei', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('0x11766ffa76') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce(feeHistory);
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return feeHistory;
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('0x11766ffa76') };
+    });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
       baseFee: bigify('75001494134'),
       maxFeePerGas: bigify('120000000000'),
@@ -101,12 +98,12 @@ describe('estimateFees', () => {
   });
 
   it('uses 1.4 multiplier for base if above 100 gwei', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('200000000000') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce(feeHistory);
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return feeHistory;
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('200000000000') };
+    });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
       baseFee: bigify('200000000000'),
       maxFeePerGas: bigify('280000000000'),
@@ -115,12 +112,12 @@ describe('estimateFees', () => {
   });
 
   it('uses 1.2 multiplier for base if above 200 gwei', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('300000000000') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce(feeHistory);
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return feeHistory;
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('300000000000') };
+    });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
       baseFee: bigify('300000000000'),
       maxFeePerGas: bigify('360000000000'),
@@ -129,12 +126,12 @@ describe('estimateFees', () => {
   });
 
   it('handles baseFee being smaller than priorityFee', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('7') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce(feeHistory);
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return feeHistory;
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('7') };
+    });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
       baseFee: bigify('7'),
       maxFeePerGas: bigify('3000000000'),
@@ -143,29 +140,27 @@ describe('estimateFees', () => {
   });
 
   it('falls back if no baseFeePerGas on block', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: undefined });
+    mockProvider.send.mockResolvedValueOnce({ ...block, baseFeePerGas: undefined });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual(FALLBACK_ESTIMATE);
   });
 
   it('falls back if priority fetching fails', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('300000000000') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce({ ...feeHistory, reward: undefined });
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return { ...feeHistory, reward: undefined };
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('300000000000') };
+    });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual(FALLBACK_ESTIMATE);
   });
 
   it('falls back if gas is VERY high', async () => {
-    (mockProvider.getLatestBlock as jest.MockedFunction<
-      typeof mockProvider.getLatestBlock
-    >).mockResolvedValueOnce({ ...block, baseFeePerGas: BigNumber.from('9999000000000') });
-    (mockProvider.getFeeHistory as jest.MockedFunction<
-      typeof mockProvider.getFeeHistory
-    >).mockResolvedValueOnce(feeHistory);
+    mockProvider.send.mockImplementation((method) => {
+      if (method === 'eth_feeHistory') {
+        return feeHistory;
+      }
+      return { ...block, baseFeePerGas: BigNumber.from('9999000000000') };
+    });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual(FALLBACK_ESTIMATE);
   });
 });

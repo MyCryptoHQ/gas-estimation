@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import { formatUnits, parseUnits } from '@ethersproject/units'
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import BigNumber from 'bignumber.js';
 
+import type { ProviderLike, WrappedProvider } from './providers';
+import { wrapProvider } from './providers';
 import { bigify, hexlify } from './utils';
 
 const MAX_GAS_FAST = 1500;
@@ -43,9 +45,9 @@ const getBaseFeeMultiplier = (baseFeeGwei: BigNumber) => {
 };
 
 const estimatePriorityFee = async (
-  provider: ProviderHandler,
+  provider: WrappedProvider,
   baseFeeGwei: BigNumber,
-  blockNumber: number
+  blockNumber: number | string
 ) => {
   if (baseFeeGwei.lt(PRIORITY_FEE_ESTIMATION_TRIGGER)) {
     return DEFAULT_PRIORITY_FEE;
@@ -73,7 +75,7 @@ const estimatePriorityFee = async (
     const next = arr[i + 1];
     const p = next.minus(cur).dividedBy(cur).multipliedBy(100);
     return [...acc, p];
-  }, []);
+  }, [] as BigNumber[]);
   const highestIncrease = BigNumber.max(...percentageIncreases);
   const highestIncreaseIndex = percentageIncreases.findIndex((p) => p.eq(highestIncrease));
 
@@ -88,8 +90,9 @@ const estimatePriorityFee = async (
   return values[Math.floor(values.length / 2)];
 };
 
-export const estimateFees = async (provider: ProviderHandler) => {
+export const estimateFees = async (rawProvider: ProviderLike) => {
   try {
+    const provider = wrapProvider(rawProvider);
     const latestBlock = await provider.getLatestBlock();
 
     if (!latestBlock.baseFeePerGas) {
@@ -129,6 +132,7 @@ export const estimateFees = async (provider: ProviderHandler) => {
       baseFee
     };
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
     return FALLBACK_ESTIMATE;
   }
