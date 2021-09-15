@@ -93,6 +93,10 @@ const estimatePriorityFee = async (
 export const estimateFees = async (rawProvider: ProviderLike) => {
   try {
     const provider = wrapProvider(rawProvider);
+    if (!provider) {
+      throw new Error('Invalid provider type');
+    }
+
     const latestBlock = await provider.getLatestBlock();
 
     if (!latestBlock.baseFeePerGas) {

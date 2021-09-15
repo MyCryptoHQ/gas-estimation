@@ -1,3 +1,6 @@
+import { createJsonRpcRequest } from '../utils';
+import { selectProvider } from './providers';
+
 export interface ProviderLike {
   send<T>(method: string, params: unknown[] | unknown): Promise<T>;
 }
@@ -43,18 +46,25 @@ export interface WrappedProvider {
   ): Promise<FeeHistory>;
 }
 
-export const wrapProvider = (rawProvider: ProviderLike): WrappedProvider => {
+export const wrapProvider = (rawProvider: ProviderLike): WrappedProvider | null => {
+  const provider = selectProvider(rawProvider);
+  if (provider === undefined) {
+    return null;
+  }
+
   const getBlock = (blockNumber: string | number) =>
-    rawProvider.send<Block>('eth_getBlockByNumber', [blockNumber, false]);
+    provider.send<Block>(
+      rawProvider,
+      createJsonRpcRequest('eth_getBlockByNumber', [blockNumber, false])
+    );
 
   const getLatestBlock = () => getBlock('latest');
 
   const getFeeHistory = (blockCount: string, newestBlock: string, rewardPercentiles?: number[]) =>
-    rawProvider.send<FeeHistory>('eth_feeHistory', [
-      blockCount,
-      newestBlock,
-      rewardPercentiles ?? []
-    ]);
+    provider.send<FeeHistory>(
+      rawProvider,
+      createJsonRpcRequest('eth_feeHistory', [blockCount, newestBlock, rewardPercentiles ?? []])
+    );
 
   return { getBlock, getLatestBlock, getFeeHistory };
 };

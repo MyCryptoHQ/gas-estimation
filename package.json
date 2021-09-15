@@ -32,7 +32,8 @@
   "dependencies": {
     "@ethersproject/bignumber": "5.4.1",
     "@ethersproject/units": "5.4.0",
-    "bignumber.js": "9.0.1"
+    "bignumber.js": "9.0.1",
+    "isomorphic-unfetch": "3.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.14",
