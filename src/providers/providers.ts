@@ -6,7 +6,7 @@ import Web3Provider from './web3';
 
 const PROVIDERS = [EIP1193Provider, EthersProvider, HttpProvider, Web3Provider];
 
-type ProviderLike = ProviderType<typeof PROVIDERS>;
+export type ProviderLike = ProviderType<typeof PROVIDERS>;
 
 export const selectProvider = (provider: ProviderLike): Provider<unknown> | undefined =>
   PROVIDERS.find((p) => p.isProvider(provider));

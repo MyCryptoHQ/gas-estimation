@@ -2,8 +2,9 @@
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import BigNumber from 'bignumber.js';
 
-import type { ProviderLike, WrappedProvider } from './providers';
+import type { ProviderLike } from './providers';
 import { wrapProvider } from './providers';
+import type { WrappedProvider, EstimationResult } from './types';
 import { bigify, hexlify } from './utils';
 
 const MAX_GAS_FAST = 1500;
@@ -90,7 +91,7 @@ const estimatePriorityFee = async (
   return values[Math.floor(values.length / 2)];
 };
 
-export const estimateFees = async (rawProvider: ProviderLike) => {
+export const estimateFees = async (rawProvider: ProviderLike): Promise<EstimationResult> => {
   try {
     const provider = wrapProvider(rawProvider);
     if (!provider) {
