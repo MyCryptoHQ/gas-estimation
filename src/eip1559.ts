@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import type { ProviderLike } from '@mycrypto/eth-scan';
 import BigNumber from 'bignumber.js';
