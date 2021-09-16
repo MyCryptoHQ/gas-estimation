@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import { formatUnits, parseUnits } from '@ethersproject/units';
+import type { ProviderLike } from '@mycrypto/eth-scan';
 import BigNumber from 'bignumber.js';
 
-import type { ProviderLike } from './providers';
-import { wrapProvider } from './providers';
-import type { WrappedProvider, EstimationResult } from './types';
+import { getFeeHistory, getLatestBlock } from './provider';
+import type { EstimationResult } from './types';
 import { bigify, hexlify } from './utils';
 
 const MAX_GAS_FAST = 1500;
@@ -46,14 +46,15 @@ const getBaseFeeMultiplier = (baseFeeGwei: BigNumber) => {
 };
 
 const estimatePriorityFee = async (
-  provider: WrappedProvider,
+  provider: ProviderLike,
   baseFeeGwei: BigNumber,
   blockNumber: number | string
 ) => {
   if (baseFeeGwei.lt(PRIORITY_FEE_ESTIMATION_TRIGGER)) {
     return DEFAULT_PRIORITY_FEE;
   }
-  const feeHistory = await provider.getFeeHistory(
+  const feeHistory = await getFeeHistory(
+    provider,
     hexlify(FEE_HISTORY_BLOCKS),
     hexlify(blockNumber),
     [FEE_HISTORY_PERCENTILE]
@@ -91,14 +92,9 @@ const estimatePriorityFee = async (
   return values[Math.floor(values.length / 2)];
 };
 
-export const estimateFees = async (rawProvider: ProviderLike): Promise<EstimationResult> => {
+export const estimateFees = async (provider: ProviderLike): Promise<EstimationResult> => {
   try {
-    const provider = wrapProvider(rawProvider);
-    if (!provider) {
-      throw new Error('Invalid provider type');
-    }
-
-    const latestBlock = await provider.getLatestBlock();
+    const latestBlock = await getLatestBlock(provider);
 
     if (!latestBlock.baseFeePerGas) {
       throw new Error('An error occurred while fetching current base fee, falling back');

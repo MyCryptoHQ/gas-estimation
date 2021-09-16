@@ -959,6 +959,11 @@
     "@ethersproject/constants" "^5.4.0"
     "@ethersproject/logger" "^5.4.0"
 
+"@findeth/abi@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@findeth/abi/-/abi-0.7.1.tgz#60d0801cb252e587dc3228f00c00581bb748aebc"
+  integrity sha512-9uNu+/UxeuIibxIB7slf7BGG2PWjgBZr+rKzohhLb7VuoZjmlCcKZkenqwErROxkPdsap7OGO/o1DuYMvObMvw==
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"
@@ -1145,6 +1150,15 @@
     "@types/node" "*"
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
+
+"@mycrypto/eth-scan@3.5.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@mycrypto/eth-scan/-/eth-scan-3.5.0.tgz#57ba90b8329e7828c953000621d0f427f325f365"
+  integrity sha512-eXl3mLlMgzuIOqT/qlQZFUJ9nkZzGQW6ljydt/vlCLWqI5A97bfm3v6FXD20tLu15Nc8THWHPDyMYff9ewMJ8Q==
+  dependencies:
+    "@findeth/abi" "^0.7.1"
+    isomorphic-unfetch "^3.1.0"
+    uuid-random-es "^2.1.1"
 
 "@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents":
   version "2.1.8-no-fsevents"
@@ -3356,7 +3370,7 @@ isobject@^3.0.0, isobject@^3.0.1:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
 
-isomorphic-unfetch@3.1.0:
+isomorphic-unfetch@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/isomorphic-unfetch/-/isomorphic-unfetch-3.1.0.tgz#87341d5f4f7b63843d468438128cb087b7c3e98f"
   integrity sha512-geDJjpoZ8N0kWexiwkX8F9NkTsXhetLPVbZFQ+JTW239QNOwvB0gniuR1Wc6f0AMTn7/mFGyXvHTifrCp/GH8Q==
@@ -5652,6 +5666,11 @@ utility-types@3.10.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
   integrity sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==
+
+uuid-random-es@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/uuid-random-es/-/uuid-random-es-2.1.1.tgz#695bbe28559d9886afdb079dd4713f3faa1651a6"
+  integrity sha512-JUGIsQZb+1O1ETxY4/p/S0rsFGPGgscECbzPXN+Xeqnlz3XmqMR3OzC64bMQ8htxDFjvuA8Gl9y3Ve/l8fQEWg==
 
 uuid@^3.3.2:
   version "3.4.0"
