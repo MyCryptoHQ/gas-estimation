@@ -60,14 +60,14 @@ const estimatePriorityFee = async (
   }
 
   // Calculate percentage increases from between ordered list of fees
-  const percentageIncreases = rewards.reduce((acc, cur, i, arr) => {
+  const percentageIncreases = rewards.reduce<bigint[]>((acc, cur, i, arr) => {
     if (i === arr.length - 1) {
       return acc;
     }
     const next = arr[i + 1];
     const p = ((next - cur) / cur) * 100n;
     return [...acc, p];
-  }, [] as bigint[]);
+  }, []);
   const highestIncrease = max(percentageIncreases);
   const highestIncreaseIndex = percentageIncreases.findIndex((p) => p === highestIncrease);
 
