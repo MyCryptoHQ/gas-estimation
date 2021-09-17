@@ -36,7 +36,7 @@ The library exposes a single function to estimate gas fees based on the latest 1
 ### `estimateFees(provider)`
 
 - `provider` - A Web3 instance, Ethers.js provider, JSON-RPC endpoint, or EIP-1193 compatible provider.
-- Returns: \<Promise\<EstimationResult\>\> - An object containing the estimated `maxFeePerGas`, `maxPriorityFeePerGas`, and `baseFee`, as `bigint`.
+- Returns: \<Promise\<EstimationResult\>\> - An object containing the estimated `maxFeePerGas`, `maxPriorityFeePerGas`, and `baseFee`, as `bigint` (all values in Wei).
 
 ### Providers
 
@@ -46,6 +46,10 @@ Currently, gas-estimation has support for four different providers:
 - Web3, by using an instance of the Web3 class.
 - HTTP, by using a URL of a JSON-RPC endpoint as string.
 - EIP-1193 compatible provider, like `window.ethereum`.
+
+## Contributing
+
+If you found a bug, have a suggestion or want to contribute in any other way, feel free to open an issue or submit a pull request. Any contributions are highly appreciated.
 
 ## Compatibility
 
