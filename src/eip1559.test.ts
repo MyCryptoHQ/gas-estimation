@@ -1,7 +1,4 @@
-import { BigNumber } from '@ethersproject/bignumber';
-
 import { estimateFees, FALLBACK_ESTIMATE } from './eip1559';
-import { bigify } from './utils';
 
 const block = {
   hash: '0x38b34c2313e148a0916406a204536c03e5bf77312c558d25d3b63d8a4e30af47',
@@ -10,13 +7,13 @@ const block = {
   timestamp: 1627469703,
   nonce: '0x0000000000000000',
   difficulty: 1,
-  gasLimit: BigNumber.from('0x01c9c380'),
-  gasUsed: BigNumber.from('0x26aee4'),
+  gasLimit: 0x01c9c380,
+  gasUsed: 0x26aee4,
   miner: '0x0000000000000000000000000000000000000000',
   extraData:
     '0xd883010a05846765746888676f312e31362e35856c696e757800000000000000a866c8e4b72c133037132849cf9419f32126bf93dfb5a42b092828fd4bfa5e8e2ce59121cb2516740c03af11225e5b6a2d9dad29cf4fe77a70af26c4ce30236601',
   transactions: [],
-  baseFeePerGas: BigNumber.from('10000000000')
+  baseFeePerGas: '0x2540be400'
 };
 
 const feeHistory = {
@@ -36,9 +33,9 @@ describe('estimateFees', () => {
   it('estimates without using priority fees', () => {
     mockProvider.send.mockResolvedValueOnce(block);
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
-      baseFee: bigify('10000000000'),
-      maxFeePerGas: bigify('20000000000'),
-      maxPriorityFeePerGas: bigify('3000000000')
+      baseFee: 10000000000n,
+      maxFeePerGas: 20000000000n,
+      maxPriorityFeePerGas: 3000000000n
     });
   });
 
@@ -47,12 +44,12 @@ describe('estimateFees', () => {
       if (method === 'eth_feeHistory') {
         return feeHistory;
       }
-      return { ...block, baseFeePerGas: BigNumber.from('100000000000') };
+      return { ...block, baseFeePerGas: '0x174876e800' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
-      baseFee: bigify('100000000000'),
-      maxFeePerGas: bigify('160000000000'),
-      maxPriorityFeePerGas: bigify('5000000000')
+      baseFee: 100000000000n,
+      maxFeePerGas: 160000000000n,
+      maxPriorityFeePerGas: 5000000000n
     });
   });
 
@@ -74,12 +71,12 @@ describe('estimateFees', () => {
           ]
         };
       }
-      return { ...block, baseFeePerGas: BigNumber.from('100000000000') };
+      return { ...block, baseFeePerGas: '0x174876e800' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
-      baseFee: bigify('100000000000'),
-      maxFeePerGas: bigify('160000000000'),
-      maxPriorityFeePerGas: bigify('5000000000')
+      baseFee: 100000000000n,
+      maxFeePerGas: 160000000000n,
+      maxPriorityFeePerGas: 5000000000n
     });
   });
 
@@ -88,12 +85,12 @@ describe('estimateFees', () => {
       if (method === 'eth_feeHistory') {
         return feeHistory;
       }
-      return { ...block, baseFeePerGas: BigNumber.from('0x11766ffa76') };
+      return { ...block, baseFeePerGas: '0x11766ffa76' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
-      baseFee: bigify('75001494134'),
-      maxFeePerGas: bigify('120000000000'),
-      maxPriorityFeePerGas: bigify('3000000000')
+      baseFee: 75001494134n,
+      maxFeePerGas: 120000000000n,
+      maxPriorityFeePerGas: 3000000000n
     });
   });
 
@@ -102,12 +99,12 @@ describe('estimateFees', () => {
       if (method === 'eth_feeHistory') {
         return feeHistory;
       }
-      return { ...block, baseFeePerGas: BigNumber.from('200000000000') };
+      return { ...block, baseFeePerGas: '0x2e90edd000' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
-      baseFee: bigify('200000000000'),
-      maxFeePerGas: bigify('280000000000'),
-      maxPriorityFeePerGas: bigify('5000000000')
+      baseFee: 200000000000n,
+      maxFeePerGas: 280000000000n,
+      maxPriorityFeePerGas: 5000000000n
     });
   });
 
@@ -116,12 +113,12 @@ describe('estimateFees', () => {
       if (method === 'eth_feeHistory') {
         return feeHistory;
       }
-      return { ...block, baseFeePerGas: BigNumber.from('300000000000') };
+      return { ...block, baseFeePerGas: '0x45d964b800' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
-      baseFee: bigify('300000000000'),
-      maxFeePerGas: bigify('360000000000'),
-      maxPriorityFeePerGas: bigify('5000000000')
+      baseFee: 300000000000n,
+      maxFeePerGas: 360000000000n,
+      maxPriorityFeePerGas: 5000000000n
     });
   });
 
@@ -130,12 +127,12 @@ describe('estimateFees', () => {
       if (method === 'eth_feeHistory') {
         return feeHistory;
       }
-      return { ...block, baseFeePerGas: BigNumber.from('7') };
+      return { ...block, baseFeePerGas: '0x7' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
-      baseFee: bigify('7'),
-      maxFeePerGas: bigify('3000000000'),
-      maxPriorityFeePerGas: bigify('3000000000')
+      baseFee: 7n,
+      maxFeePerGas: 3000000000n,
+      maxPriorityFeePerGas: 3000000000n
     });
   });
 
@@ -149,7 +146,7 @@ describe('estimateFees', () => {
       if (method === 'eth_feeHistory') {
         return { ...feeHistory, reward: undefined };
       }
-      return { ...block, baseFeePerGas: BigNumber.from('300000000000') };
+      return { ...block, baseFeePerGas: '0x45d964b800' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual(FALLBACK_ESTIMATE);
   });
@@ -159,7 +156,7 @@ describe('estimateFees', () => {
       if (method === 'eth_feeHistory') {
         return feeHistory;
       }
-      return { ...block, baseFeePerGas: BigNumber.from('9999000000000') };
+      return { ...block, baseFeePerGas: '0x91812d7d600' };
     });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual(FALLBACK_ESTIMATE);
   });

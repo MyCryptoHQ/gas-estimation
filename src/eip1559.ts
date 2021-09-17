@@ -1,55 +1,46 @@
-import { formatUnits, parseUnits } from '@ethersproject/units';
 import type { ProviderLike } from '@mycrypto/eth-scan';
-import BigNumber from 'bignumber.js';
 
 import { getFeeHistory, getLatestBlock } from './provider';
 import type { EstimationResult } from './types';
-import { bigify, hexlify } from './utils';
+import { gwei, hexlify, max, roundToWholeGwei } from './utils';
 
-const MAX_GAS_FAST = 1500;
+const MAX_GAS_FAST = gwei(1500n); // 1500 GWEI
 
 // How many blocks to consider for priority fee estimation
 const FEE_HISTORY_BLOCKS = 10;
 // Which percentile of effective priority fees to include
 const FEE_HISTORY_PERCENTILE = 5;
 // Which base fee to trigger priority fee estimation at
-const PRIORITY_FEE_ESTIMATION_TRIGGER = 100; // GWEI
+const PRIORITY_FEE_ESTIMATION_TRIGGER = gwei(100n); // 100 GWEI
 // Returned if above trigger is not met
-const DEFAULT_PRIORITY_FEE = bigify(parseUnits('3', 'gwei'));
+const DEFAULT_PRIORITY_FEE = gwei(3n); // 3 GWEI
 // In case something goes wrong fall back to this estimate
 export const FALLBACK_ESTIMATE = {
-  maxFeePerGas: bigify(parseUnits('20', 'gwei')),
+  maxFeePerGas: gwei(20n), // 20 GWEI
   maxPriorityFeePerGas: DEFAULT_PRIORITY_FEE,
   baseFee: undefined
 };
 const PRIORITY_FEE_INCREASE_BOUNDARY = 200; // %
 
-const toGwei = (wei: BigNumber) => bigify(formatUnits(hexlify(wei.integerValue()), 'gwei'));
-
-const roundToWholeGwei = (wei: BigNumber) => {
-  const gwei = toGwei(wei);
-  const rounded = gwei.integerValue(BigNumber.ROUND_HALF_UP);
-  return bigify(parseUnits(rounded.toString(10), 'gwei'));
-};
-
-const getBaseFeeMultiplier = (baseFeeGwei: BigNumber) => {
-  if (baseFeeGwei.lte(40)) {
-    return bigify(2.0);
-  } else if (baseFeeGwei.lte(100)) {
-    return bigify(1.6);
-  } else if (baseFeeGwei.lte(200)) {
-    return bigify(1.4);
+// Returns base fee multiplier percentage
+const getBaseFeeMultiplier = (baseFee: bigint) => {
+  if (baseFee <= gwei(40n)) {
+    return 200n;
+  } else if (baseFee <= gwei(100n)) {
+    return 160n;
+  } else if (baseFee <= gwei(200n)) {
+    return 140n;
   } else {
-    return bigify(1.2);
+    return 120n;
   }
 };
 
 const estimatePriorityFee = async (
   provider: ProviderLike,
-  baseFeeGwei: BigNumber,
-  blockNumber: number | string
+  baseFee: bigint,
+  blockNumber: bigint
 ) => {
-  if (baseFeeGwei.lt(PRIORITY_FEE_ESTIMATION_TRIGGER)) {
+  if (baseFee < PRIORITY_FEE_ESTIMATION_TRIGGER) {
     return DEFAULT_PRIORITY_FEE;
   }
   const feeHistory = await getFeeHistory(
@@ -60,8 +51,8 @@ const estimatePriorityFee = async (
   );
 
   const rewards = feeHistory.reward
-    ?.map((r) => bigify(r[0]))
-    .filter((r) => !r.isZero())
+    ?.map((r) => BigInt(r[0]))
+    .filter((r) => r > 0n)
     .sort();
 
   if (!rewards) {
@@ -74,16 +65,16 @@ const estimatePriorityFee = async (
       return acc;
     }
     const next = arr[i + 1];
-    const p = next.minus(cur).dividedBy(cur).multipliedBy(100);
+    const p = ((next - cur) / cur) * 100n;
     return [...acc, p];
-  }, [] as BigNumber[]);
-  const highestIncrease = BigNumber.max(...percentageIncreases);
-  const highestIncreaseIndex = percentageIncreases.findIndex((p) => p.eq(highestIncrease));
+  }, [] as bigint[]);
+  const highestIncrease = max(percentageIncreases);
+  const highestIncreaseIndex = percentageIncreases.findIndex((p) => p === highestIncrease);
 
   // If we have big increase in value, we could be considering "outliers" in our estimate
   // Skip the low elements and take a new median
   const values =
-    highestIncrease.gte(PRIORITY_FEE_INCREASE_BOUNDARY) &&
+    highestIncrease >= PRIORITY_FEE_INCREASE_BOUNDARY &&
     highestIncreaseIndex >= Math.floor(rewards.length / 2)
       ? rewards.slice(highestIncreaseIndex)
       : rewards;
@@ -99,30 +90,27 @@ export const estimateFees = async (provider: ProviderLike): Promise<EstimationRe
       throw new Error('An error occurred while fetching current base fee, falling back');
     }
 
-    const baseFee = bigify(latestBlock.baseFeePerGas);
+    const baseFee = BigInt(latestBlock.baseFeePerGas);
 
-    const baseFeeGwei = bigify(formatUnits(hexlify(baseFee), 'gwei'));
+    const blockNumber = BigInt(latestBlock.number);
 
-    const estimatedPriorityFee = await estimatePriorityFee(
-      provider,
-      baseFeeGwei,
-      latestBlock.number
-    );
+    const estimatedPriorityFee = await estimatePriorityFee(provider, baseFee, blockNumber);
 
     if (estimatedPriorityFee === null) {
       throw new Error('An error occurred while estimating priority fee, falling back');
     }
 
-    const maxPriorityFeePerGas = BigNumber.max(estimatedPriorityFee, DEFAULT_PRIORITY_FEE);
+    const maxPriorityFeePerGas = max([estimatedPriorityFee, DEFAULT_PRIORITY_FEE]);
 
-    const multiplier = getBaseFeeMultiplier(baseFeeGwei);
+    const multiplier = getBaseFeeMultiplier(baseFee);
 
-    const potentialMaxFee = baseFee.multipliedBy(multiplier);
-    const maxFeePerGas = maxPriorityFeePerGas.gt(potentialMaxFee)
-      ? potentialMaxFee.plus(maxPriorityFeePerGas)
-      : potentialMaxFee;
+    const potentialMaxFee = (baseFee * multiplier) / 100n;
+    const maxFeePerGas =
+      maxPriorityFeePerGas > potentialMaxFee
+        ? potentialMaxFee + maxPriorityFeePerGas
+        : potentialMaxFee;
 
-    if (toGwei(maxFeePerGas).gte(MAX_GAS_FAST) || toGwei(maxPriorityFeePerGas).gte(MAX_GAS_FAST)) {
+    if (maxFeePerGas >= MAX_GAS_FAST || maxPriorityFeePerGas >= MAX_GAS_FAST) {
       throw new Error('Estimated gas fee was much higher than expected, erroring');
     }
 

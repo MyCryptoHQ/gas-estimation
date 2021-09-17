@@ -1,5 +1,3 @@
 import { addHexPrefix } from './addHexPrefix';
-import type { BigifySupported } from './bigify';
-import { bigify } from './bigify';
 
-export const hexlify = (input: BigifySupported): string => addHexPrefix(bigify(input).toString(16));
+export const hexlify = (input: number | bigint): string => addHexPrefix(input.toString(16));
