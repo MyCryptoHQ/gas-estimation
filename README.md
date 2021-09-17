@@ -40,7 +40,7 @@ The library exposes a single function to estimate gas fees based on the latest 1
 
 ### Providers
 
-Currently, eth-scan has support for four different providers:
+Currently, gas-estimation has support for four different providers:
 
 - Ethers.js, by using an existing Ethers.js provider.
 - Web3, by using an instance of the Web3 class.
