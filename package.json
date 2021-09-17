@@ -32,7 +32,7 @@
   "dependencies": {
     "@ethersproject/bignumber": "5.4.1",
     "@ethersproject/units": "5.4.0",
-    "@mycrypto/eth-scan": "3.5.0",
+    "@mycrypto/eth-scan": "3.5.1",
     "bignumber.js": "9.0.1"
   },
   "devDependencies": {
