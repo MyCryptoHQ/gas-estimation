@@ -4,19 +4,19 @@ import { getFeeHistory, getLatestBlock } from './provider';
 import type { EstimationResult } from './types';
 import { gwei, hexlify, max, roundToWholeGwei } from './utils';
 
-const MAX_GAS_FAST = gwei(1500n); // 1500 GWEI
+const MAX_GAS_FAST = gwei(1500n);
 
 // How many blocks to consider for priority fee estimation
 const FEE_HISTORY_BLOCKS = 10;
 // Which percentile of effective priority fees to include
 const FEE_HISTORY_PERCENTILE = 5;
 // Which base fee to trigger priority fee estimation at
-const PRIORITY_FEE_ESTIMATION_TRIGGER = gwei(100n); // 100 GWEI
+const PRIORITY_FEE_ESTIMATION_TRIGGER = gwei(100n);
 // Returned if above trigger is not met
-const DEFAULT_PRIORITY_FEE = gwei(3n); // 3 GWEI
+const DEFAULT_PRIORITY_FEE = gwei(3n);
 // In case something goes wrong fall back to this estimate
 export const FALLBACK_ESTIMATE = {
-  maxFeePerGas: gwei(20n), // 20 GWEI
+  maxFeePerGas: gwei(20n),
   maxPriorityFeePerGas: DEFAULT_PRIORITY_FEE,
   baseFee: undefined
 };
