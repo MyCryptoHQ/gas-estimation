@@ -29,7 +29,9 @@
     "prepare": "simple-git-hooks",
     "prepack": "yarn build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@mycrypto/eth-scan": "3.5.1"
+  },
   "devDependencies": {
     "@babel/cli": "^7.13.14",
     "@babel/core": "^7.13.14",
