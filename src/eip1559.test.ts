@@ -137,6 +137,15 @@ describe('calculateFees', () => {
     });
   });
 
+  it('handles empty rewards for fee history', () => {
+    const baseFee = BigInt('0x45d964b800');
+    return expect(calculateFees(baseFee, { ...feeHistory, reward: undefined })).toStrictEqual({
+      baseFee: 300000000000n,
+      maxFeePerGas: 360000000000n,
+      maxPriorityFeePerGas: FALLBACK_ESTIMATE.maxPriorityFeePerGas
+    });
+  });
+
   it('falls back if gas is VERY high', () => {
     const baseFee = BigInt('0x91812d7d600');
     return expect(calculateFees(baseFee, feeHistory)).toStrictEqual(FALLBACK_ESTIMATE);
