@@ -1114,10 +1114,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@mycrypto/eth-scan@3.5.1":
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/@mycrypto/eth-scan/-/eth-scan-3.5.1.tgz#edf32d868163a31cd302de60c370966df8db0f9f"
-  integrity sha512-3DXDs4eL9dF0hosJJkgsqAKY09oGdOhAYYIo1Fdk9of+AwSR9uf3aKc8cj9XOqT9336LOzwK1ltOSE1DpkYWFA==
+"@mycrypto/eth-scan@3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@mycrypto/eth-scan/-/eth-scan-3.5.2.tgz#5dd558b06a2a3d3a0d6d799f28b895b3b772fede"
+  integrity sha512-gHTeK2inci6220bSac8oOy35CPz7bkxJyuv9fBUuQBi/ekBL2yupcf36L7nrzTiBXCMHveKwWC34m592Z1qWJw==
   dependencies:
     "@findeth/abi" "^0.7.1"
     isomorphic-unfetch "^3.1.0"
