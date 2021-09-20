@@ -47,6 +47,14 @@ describe('estimateFees', () => {
     mockProvider.send.mockResolvedValueOnce({ ...block, baseFeePerGas: undefined });
     return expect(estimateFees(mockProvider)).resolves.toStrictEqual(FALLBACK_ESTIMATE);
   });
+  it('skips fee history if trigger not met', async () => {
+    mockProvider.send.mockResolvedValueOnce({ ...block, baseFeePerGas: '0x7' });
+    return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
+      baseFee: 7n,
+      maxFeePerGas: 3000000000n,
+      maxPriorityFeePerGas: 3000000000n
+    });
+  });
 });
 
 describe('calculateFees', () => {
