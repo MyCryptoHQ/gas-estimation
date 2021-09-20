@@ -31,12 +31,18 @@ console.log(maxFeePerGas, maxPriorityFeePerGas);
 
 ## API
 
-The library exposes a single function to estimate gas fees based on the latest 10 blocks.
+The library exposes a function to estimate gas fees based on the latest 10 blocks, and the underlying function used to calculate the estimate.
 
 ### `estimateFees(provider)`
 
 - `provider` - A Web3 instance, Ethers.js provider, JSON-RPC endpoint, or EIP-1193 compatible provider.
 - Returns: \<Promise\<EstimationResult\>\> - An object containing the estimated `maxFeePerGas`, `maxPriorityFeePerGas`, and `baseFee`, as `bigint` (all values in Wei).
+
+### `calculateFees(baseFee, feeHistory)`
+
+- `baseFee` - The current base fee as a `bigint` (in Wei).
+- `feeHistory` - The fee history object returned by a node when calling `eth_feeHistory`.
+- Returns: \<EstimationResult\> - An object containing the estimated `maxFeePerGas`, `maxPriorityFeePerGas`, and `baseFee`, as `bigint` (all values in Wei).
 
 ### Providers
 
