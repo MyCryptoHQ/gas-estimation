@@ -1,7 +1,7 @@
 import type { ProviderLike } from '@mycrypto/eth-scan';
 
 import { getFeeHistory, getLatestBlock } from './provider';
-import type { EstimationResult } from './types';
+import type { EstimationResult, FeeHistory } from './types';
 import { gwei, hexlify, max, roundToWholeGwei } from './utils';
 
 const MAX_GAS_FAST = gwei(1500n);
@@ -35,20 +35,10 @@ const getBaseFeeMultiplier = (baseFee: bigint) => {
   }
 };
 
-const estimatePriorityFee = async (
-  provider: ProviderLike,
-  baseFee: bigint,
-  blockNumber: bigint
-) => {
-  if (baseFee < PRIORITY_FEE_ESTIMATION_TRIGGER) {
-    return DEFAULT_PRIORITY_FEE;
+const calculatePriorityFeeEstimate = (feeHistory?: FeeHistory) => {
+  if (!feeHistory) {
+    return null;
   }
-  const feeHistory = await getFeeHistory(
-    provider,
-    hexlify(FEE_HISTORY_BLOCKS),
-    hexlify(blockNumber),
-    [FEE_HISTORY_PERCENTILE]
-  );
 
   const rewards = feeHistory.reward
     ?.map((r) => BigInt(r[0]))
@@ -82,25 +72,11 @@ const estimatePriorityFee = async (
   return values[Math.floor(values.length / 2)];
 };
 
-export const estimateFees = async (provider: ProviderLike): Promise<EstimationResult> => {
+export const calculateFees = (baseFee: bigint, feeHistory?: FeeHistory): EstimationResult => {
   try {
-    const latestBlock = await getLatestBlock(provider);
+    const estimatedPriorityFee = calculatePriorityFeeEstimate(feeHistory);
 
-    if (!latestBlock.baseFeePerGas) {
-      throw new Error('An error occurred while fetching current base fee, falling back');
-    }
-
-    const baseFee = BigInt(latestBlock.baseFeePerGas);
-
-    const blockNumber = BigInt(latestBlock.number);
-
-    const estimatedPriorityFee = await estimatePriorityFee(provider, baseFee, blockNumber);
-
-    if (estimatedPriorityFee === null) {
-      throw new Error('An error occurred while estimating priority fee, falling back');
-    }
-
-    const maxPriorityFeePerGas = max([estimatedPriorityFee, DEFAULT_PRIORITY_FEE]);
+    const maxPriorityFeePerGas = max([estimatedPriorityFee ?? 0n, DEFAULT_PRIORITY_FEE]);
 
     const multiplier = getBaseFeeMultiplier(baseFee);
 
@@ -119,6 +95,33 @@ export const estimateFees = async (provider: ProviderLike): Promise<EstimationRe
       maxPriorityFeePerGas: roundToWholeGwei(maxPriorityFeePerGas),
       baseFee
     };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(err);
+    return FALLBACK_ESTIMATE;
+  }
+};
+
+export const estimateFees = async (provider: ProviderLike): Promise<EstimationResult> => {
+  try {
+    const latestBlock = await getLatestBlock(provider);
+
+    if (!latestBlock.baseFeePerGas) {
+      throw new Error('An error occurred while fetching current base fee, falling back');
+    }
+
+    const baseFee = BigInt(latestBlock.baseFeePerGas);
+
+    const blockNumber = BigInt(latestBlock.number);
+
+    const feeHistory =
+      baseFee >= PRIORITY_FEE_ESTIMATION_TRIGGER
+        ? await getFeeHistory(provider, hexlify(FEE_HISTORY_BLOCKS), hexlify(blockNumber), [
+            FEE_HISTORY_PERCENTILE
+          ])
+        : undefined;
+
+    return calculateFees(baseFee, feeHistory);
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);

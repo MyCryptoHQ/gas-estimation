@@ -148,7 +148,11 @@ describe('estimateFees', () => {
       }
       return { ...block, baseFeePerGas: '0x45d964b800' };
     });
-    return expect(estimateFees(mockProvider)).resolves.toStrictEqual(FALLBACK_ESTIMATE);
+    return expect(estimateFees(mockProvider)).resolves.toStrictEqual({
+      baseFee: 300000000000n,
+      maxFeePerGas: 360000000000n,
+      maxPriorityFeePerGas: FALLBACK_ESTIMATE.maxPriorityFeePerGas
+    });
   });
 
   it('falls back if gas is VERY high', async () => {
