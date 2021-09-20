@@ -31,7 +31,7 @@ console.log(maxFeePerGas, maxPriorityFeePerGas);
 
 ## API
 
-The library exposes a function to estimate gas fees based on the latest 10 blocks and the underlying function used to calculate the estimate.
+The library exposes a function to estimate gas fees based on the latest 10 blocks, and the underlying function used to calculate the estimate.
 
 ### `estimateFees(provider)`
 
