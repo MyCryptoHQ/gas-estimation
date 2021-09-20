@@ -1,6 +1,6 @@
 {
   "name": "@mycrypto/gas-estimation",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The MyCrypto EIP 1559 gas estimation strategy, now provided as a library.",
   "repository": "MyCryptoHQ/gas-estimation",
   "author": "MyCrypto",
