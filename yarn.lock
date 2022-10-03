@@ -1114,14 +1114,14 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@mycrypto/eth-scan@3.5.2":
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/@mycrypto/eth-scan/-/eth-scan-3.5.2.tgz#5dd558b06a2a3d3a0d6d799f28b895b3b772fede"
-  integrity sha512-gHTeK2inci6220bSac8oOy35CPz7bkxJyuv9fBUuQBi/ekBL2yupcf36L7nrzTiBXCMHveKwWC34m592Z1qWJw==
+"@mycrypto/eth-scan@3.5.3":
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/@mycrypto/eth-scan/-/eth-scan-3.5.3.tgz#c2c9cff253b4d2821f77ab0ba73b8f5d7dab1e4c"
+  integrity sha512-CbMHc+RUCANQMGKt2T65UDZY5kKOHx8lSvupq5fB4UzglcINeyeEekd6TsbW0/1G+7lUXe6fELQmtGSqEPQSvg==
   dependencies:
     "@findeth/abi" "^0.7.1"
     isomorphic-unfetch "^3.1.0"
-    uuid-random-es "^2.1.1"
+    nanoid "^3.1.28"
 
 "@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents":
   version "2.1.8-no-fsevents"
@@ -4099,6 +4099,11 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
+nanoid@^3.1.28:
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
+  integrity sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==
+
 nanomatch@^1.2.9:
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
@@ -5547,11 +5552,6 @@ utility-types@3.10.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
   integrity sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==
-
-uuid-random-es@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/uuid-random-es/-/uuid-random-es-2.1.1.tgz#695bbe28559d9886afdb079dd4713f3faa1651a6"
-  integrity sha512-JUGIsQZb+1O1ETxY4/p/S0rsFGPGgscECbzPXN+Xeqnlz3XmqMR3OzC64bMQ8htxDFjvuA8Gl9y3Ve/l8fQEWg==
 
 uuid@^3.3.2:
   version "3.4.0"

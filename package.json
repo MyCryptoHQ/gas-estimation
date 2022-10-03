@@ -1,6 +1,6 @@
 {
   "name": "@mycrypto/gas-estimation",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "The MyCrypto EIP 1559 gas estimation strategy, now provided as a library.",
   "repository": "MyCryptoHQ/gas-estimation",
   "author": "MyCrypto",
@@ -30,7 +30,7 @@
     "prepack": "yarn build"
   },
   "dependencies": {
-    "@mycrypto/eth-scan": "3.5.2"
+    "@mycrypto/eth-scan": "3.5.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.14",
